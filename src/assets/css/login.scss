@@ -1,0 +1,104 @@
+.login-wrapper {
+  height: 100vh;
+  display: grid;
+  place-content: center;
+  .login-container {
+    border-radius: 8px;
+    border: 0px solid #e5e7eb;
+    background: #fff;
+    box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.1),
+      0px 10px 15px 0px rgba(0, 0, 0, 0.1);
+    padding: 8px 32px 38px;
+    .logo {
+      background: url(<path-to-image>) lightgray 50% / cover no-repeat;
+      box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+      img {
+        width: 358.154px;
+        height: 80px;
+      }
+    }
+    .sub-header {
+      color: #4b5563;
+      font-family: Inter;
+      font-size: 14px;
+      font-weight: 400;
+      margin-top: 10px;
+    }
+    .remember-forgot {
+      margin-top: 8px;
+      label {
+        color: #374151;
+        font-size: 14px;
+
+        font-weight: 400;
+      }
+      p {
+        color: #2563eb;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+    .sign-in-button {
+      border-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0);
+      background: #2563eb;
+      box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      padding: 14px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      margin: 24px 0px;
+    }
+    .continue-with {
+      align-items: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      div {
+        border-top: 1px solid #d1d5db;
+      }
+      p {
+        color: #6b7280;
+        font-size: 14px;
+
+        font-weight: 400;
+      }
+    }
+    .google-apple {
+      gap: 12px;
+      margin-top: 24px;
+      button {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+        padding: 10px 0px;
+        gap: 8px;
+        width: 186px;
+      }
+    }
+    form {
+      margin-top: 32px;
+      .input-group {
+        margin-bottom: 16px;
+        gap: 6px;
+        label {
+          color: #374151;
+          font-size: 14px;
+          font-weight: 500;
+          text-align: start;
+        }
+        input {
+          border-radius: 6px;
+          border: 1px solid #d1d5db;
+          background: #fff;
+          box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+          width: 384px;
+          height: 42px;
+          padding: 4px 12px;
+          box-sizing: border-box;
+        }
+      }
+    }
+  }
+}
