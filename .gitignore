@@ -1,0 +1,32 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Vite cache
+.vite/
+
+# Logs
+*.log
+
+# Dependency directories
+.pnpm/
+.yarn/
+.yarn-integrity
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and OS-specific files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Optional: Ignore package-lock or yarn.lock (not recommended for most projects)
+# package-lock.json
+# yarn.lock
+
