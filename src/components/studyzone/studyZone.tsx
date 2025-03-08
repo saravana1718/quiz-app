@@ -14,7 +14,7 @@ import { Box } from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router";
 import VideoPlayer from "@components/common/videoPlayer";
 import QuizApp from "@components/common/quiz";
-import { baseUrl, post } from "@utils/coreApiServices";
+import { baseUrl, get, post } from "@utils/coreApiServices";
 
 type ContinueLearningOption = {
   chapter: string;
@@ -38,7 +38,7 @@ type ContentChooser = {
 
 type Subject = {
   name: string;
-  units: Record<string, Unit>;
+ 
   total_units: number;
   total_chapters: number;
 };
@@ -60,7 +60,7 @@ type Chapter = {
 type Lecture = {
   name: string;
   bucket_path: string;
-  progress: string;
+ 
 };
 
 const StudyZone: React.FC = () => {
@@ -71,6 +71,9 @@ const StudyZone: React.FC = () => {
   const unit = searchParams.get("unit");
   const Chapter = searchParams.get("chapter");
   const [studyZoneData, setStudyZoneData] = useState<Data>();
+  const [units,setUnits]=useState<Record<string, string>>()
+  const [chapters,setChapters]=useState<Record<string, string>>()
+  const[lecture,setLecture]=useState<Record<string, Lecture>>()
   const token = localStorage.getItem("accessToken");
   const [videoUrl, setVideoUrl] = useState("");
   const [fileName, setFilename] = useState("");
@@ -115,149 +118,7 @@ const StudyZone: React.FC = () => {
       </Box>
     );
   }
-  // const continueWatching = [
-  //   {
-  //     title: "Quantum Mechanics",
-  //     sub: "Physics",
-  //     chapter: "8",
-  //     val: 75,
-  //     color: "#2563EB",
-  //   },
-  //   {
-  //     title: "Thermodynamics",
-  //     sub: "Chemistry",
-  //     chapter: "4",
-  //     val: 45,
-  //     color: "#059669",
-  //   },
-  //   {
-  //     title: "Trigonometry",
-  //     sub: "Mathematics",
-  //     chapter: "4",
-  //     val: 65,
-  //     color: "#7C3AED",
-  //   },
-  // ];
-  // const chapter = [
-  //   {
-  //     title: "1. Quantum Mechanics",
-  //     sub: "Physics",
-  //     topics: "8",
-  //     completed: "4",
-  //     val: 75,
-  //     color: "#2563EB",
-  //   },
-  //   {
-  //     title: "2. Thermodynamics",
-  //     sub: "Chemistry",
-  //     topics: "8",
-  //     completed: "0",
-  //     val: 0,
-  //     color: "#059669",
-  //   },
-  //   {
-  //     title: "3. Trigonometry",
-  //     sub: "Mathematics",
-  //     topics: "8",
-  //     completed: "8",
-  //     val: 100,
-  //     color: "#7C3AED",
-  //   },
-  //   {
-  //     title: "Quantum Mechanics",
-  //     sub: "Physics",
-  //     topics: "8",
-  //     completed: "4",
-  //     val: 75,
-  //     color: "#2563EB",
-  //   },
-  //   {
-  //     title: "Thermodynamics",
-  //     sub: "Chemistry",
-  //     topics: "8",
-  //     completed: "0",
-  //     val: 0,
-  //     color: "#059669",
-  //   },
-  //   {
-  //     title: "Trigonometry",
-  //     sub: "Mathematics",
-  //     topics: "8",
-  //     completed: "8",
-  //     val: 100,
-  //     color: "#7C3AED",
-  //   },
-  //   {
-  //     title: "Quantum Mechanics",
-  //     sub: "Physics",
-  //     topics: "8",
-  //     completed: "4",
-  //     val: 75,
-  //     color: "#2563EB",
-  //   },
-  //   {
-  //     title: "Thermodynamics",
-  //     sub: "Chemistry",
-  //     topics: "8",
-  //     completed: "0",
-  //     val: 0,
-  //     color: "#059669",
-  //   },
-  //   {
-  //     title: "Trigonometry",
-  //     sub: "Mathematics",
-  //     topics: "8",
-  //     completed: "8",
-  //     val: 100,
-  //     color: "#7C3AED",
-  //   },
-  //   {
-  //     title: "Quantum Mechanics",
-  //     sub: "Physics",
-  //     topics: "8",
-  //     completed: "4",
-  //     val: 75,
-  //     color: "#2563EB",
-  //   },
-  //   {
-  //     title: "Thermodynamics",
-  //     sub: "Chemistry",
-  //     topics: "8",
-  //     completed: "0",
-  //     val: 0,
-  //     color: "#059669",
-  //   },
-  //   {
-  //     title: "Trigonometry",
-  //     sub: "Mathematics",
-  //     topics: "8",
-  //     completed: "8",
-  //     val: 100,
-  //     color: "#7C3AED",
-  //   },
-  // ];
-  // const topics = [
-  //   {
-  //     title: "Introduction to Waves",
-  //     estimation: 30,
-  //     status: "done",
-  //   },
-  //   {
-  //     title: "Types of Waves",
-  //     estimation: 45,
-  //     status: "done",
-  //   },
-  //   {
-  //     title: "Wave Properties",
-  //     estimation: 40,
-  //     status: "paused",
-  //   },
-  //   {
-  //     title: "Wave Equations",
-  //     estimation: 50,
-  //     status: "Yet",
-  //   },
-  // ];
+
   const getHomeData = async () => {
     const res = await post(
       `${baseUrl}api/v1/study/`,
@@ -281,29 +142,10 @@ const StudyZone: React.FC = () => {
     );
     setStudyZoneData(res?.data);
   };
-  const transformContent = (data: ContentChooser) => {
-    if (studyZoneData) {
-      return {
-        title: data?.title,
-        content: Object.values(data.content).map((subject) => ({
-          ...subject,
-          units: Object.values(subject.units).map((unit) => ({
-            ...unit,
-            chapters: Object.values(unit.chapters).map((chapter) => ({
-              ...chapter,
-              lectures: Object.values(chapter.lectures),
-            })),
-          })),
-        })),
-      };
-    }
-  };
-  const transformedData = studyZoneData
-    ? transformContent(studyZoneData?.content_chooser)
-    : null;
+ 
   const getVideoUrl = async (obj: string) => {
     const res = await post(
-      `${baseUrl}api/v1/study/URL`,
+      `${baseUrl}api/v1/study/url`,
       {
         object_name: obj,
         bucket_name: "matrix_edu_enrollments",
@@ -315,9 +157,51 @@ const StudyZone: React.FC = () => {
     setsubject(sub || "");
     setVideoUrl(res?.data?.signed_url);
   };
+  const getUnits = async (id: string) => {
+    const res = await get(
+      `${baseUrl}api/v1/study/units/${id}`,
+      { AUTHORIZATION: `Bearer ${token}` },
+     
+    );
+  setUnits(res?.data)
+  };
+  const getChapters = async (id: string) => {
+    const res = await get(
+      `${baseUrl}api/v1/study/chapters/${id}`,
+      { AUTHORIZATION: `Bearer ${token}` },
+     
+    );
+    setChapters(res?.data)
+  };
+  const getLectures = async (id: string) => {
+    const res = await get(
+      `${baseUrl}api/v1/study/lectures/${id}`,
+      { AUTHORIZATION: `Bearer ${token}` },
+     
+    );
+    setLecture(res?.data)
+  };
   useEffect(() => {
     getHomeData();
   }, []);
+  useEffect(() => {
+    if(id){
+      setUnits({});
+      setChapters({});
+      setLecture({});
+      getUnits(id);
+    }
+  }, [id]);
+  useEffect(() => {
+    if(unit){
+      getChapters(unit);
+    }
+  }, [unit]);
+  useEffect(() => {
+    if(Chapter){
+      getLectures(Chapter);
+    }
+  }, [Chapter]);
   return (
     <div className="container">
       {!section ? (
@@ -403,9 +287,9 @@ const StudyZone: React.FC = () => {
           <div className="quick-actions-wrapper d-flex flex-column ">
             <h3>{studyZoneData?.content_chooser.content[id as string].name}</h3>
             <div className="video-card-wrapper video-grid d-flex flex-column ">
-              {studyZoneData &&
+              {units &&
                 Object.entries(
-                  studyZoneData?.content_chooser.content[id as string].units
+                 units
                 )?.map(([key, data]) => (
                   <div
                     className="card video-card d-flex flex-column"
@@ -417,7 +301,7 @@ const StudyZone: React.FC = () => {
                     }
                   >
                     <p className="title d-flex align-center justify-between">
-                      {data.name}{" "}
+                      {data}{" "}
                       {/* <p
                         className={`status ${
                           data.val === 0
@@ -461,17 +345,16 @@ const StudyZone: React.FC = () => {
           <div className="quick-actions-wrapper d-flex flex-column ">
             <h3>
               {
-                studyZoneData?.content_chooser.content[id as string]?.units[
+                units&&units[
                   unit as string
-                ]?.name
+                ]
               }
             </h3>
             <div className="video-card-wrapper video-grid d-flex flex-column ">
-              {studyZoneData &&
+              {chapters &&
                 Object.entries(
-                  studyZoneData?.content_chooser.content[id as string]?.units[
-                    unit as string
-                  ].chapters
+              
+                 chapters
                 )?.map(([key, data], idx) => (
                   <div
                     className="card video-card d-flex flex-column"
@@ -483,8 +366,8 @@ const StudyZone: React.FC = () => {
                     }
                   >
                     <p className="title d-flex align-center justify-between">
-                      {data.name}{" "}
-                      <p
+                      {data}{" "}
+                      {/* <p
                         className={`status ${
                           parseInt(data.progress) === 0
                             ? "not-started"
@@ -498,15 +381,15 @@ const StudyZone: React.FC = () => {
                           : data.completed
                           ? "Completed"
                           : "In Progress"}{" "}
-                      </p>
+                      </p> */}
                     </p>
-
+{/* 
                     <div className="sub">{`${data.total_lectures} • Topics `}</div>
 
                     <LinearProgressWithLabel
                       value={parseInt(data.progress)}
                       bgcolor={"#2563EB"}
-                    />
+                    /> */}
                   </div>
                 ))}
             </div>
@@ -527,18 +410,16 @@ const StudyZone: React.FC = () => {
           <div className="quick-actions-wrapper d-flex flex-column ">
             <h3>
               {
-                studyZoneData?.content_chooser.content[id as string]?.units[
-                  unit as string
-                ].chapters[Chapter as string]?.name
+              chapters&&chapters[Chapter as string]
               }
             </h3>
             <div className="topics-wrapper d-flex flex-column ">
-              {studyZoneData &&
+              {lecture &&
                 Object.entries(
-                  studyZoneData?.content_chooser.content[id as string]?.units[
-                    unit as string
-                  ].chapters[Chapter as string]?.lectures
+                lecture
+                  
                 )?.map(([key, data], idx) => (
+                 
                   <div
                     className="card video-card d-flex align-center justify-between"
                     key={idx}
@@ -546,11 +427,12 @@ const StudyZone: React.FC = () => {
                       navigate(
                         `/study-zone?section=video&unit=${unit}&val=${id}&chapter=${Chapter}&sub=${sub}`
                       );
-                      getVideoUrl(data.name);
+                      getVideoUrl(data.bucket_path);
                     }}
                   >
+               
                     <div className="icon-details-wrapper d-flex align-center">
-                      <div
+                      {/* <div
                         className={`img ${
                           parseInt(data.progress) === 100
                             ? "Done"
@@ -568,23 +450,23 @@ const StudyZone: React.FC = () => {
                               ? Lock
                               : Continue
                           }
-                        />{" "}
+                        />{" "} */}
                       </div>
                       <div className="details d-flex ">
                         <p className="title d-flex align-center justify-between">
                           {data.name}
                         </p>
 
-                        {/* <div className="sub">{`Estimated time: ${data.estimation} mins`}</div> */}
+                       
                       </div>
                     </div>
-                    {parseInt(data.progress) !== 100 ||
-                    parseInt(data.progress) !== 0 ? (
-                      <button>Continue</button>
-                    ) : (
-                      <img alt="alt" src={Arrow} />
-                    )}
-                  </div>
+                    // {/* {parseInt(data.progress) !== 100 ||
+                    // parseInt(data.progress) !== 0 ? (
+                    //   <button>Continue</button>
+                    // ) : (
+                    //   <img alt="alt" src={Arrow} />
+                    // )} */}
+                 
                 ))}
             </div>
           </div>
