@@ -44,17 +44,18 @@ type Subject = {
 };
 
 type Unit = {
-  name: string;
-  chapters: Record<string, Chapter>;
+  [key: string]: {
+      name: string;
+      subject_id: string;
+  };
 };
 
 type Chapter = {
-  name: string;
-  lectures: Record<string, Lecture>;
-  total_lectures: string;
-  progress: string;
-  previously_player: string;
-  completed: boolean;
+  [key: string]: {
+    name: string;
+    subject_id: string;
+    unit_id:string;
+};
 };
 
 type Lecture = {
@@ -71,13 +72,14 @@ const StudyZone: React.FC = () => {
   const unit = searchParams.get("unit");
   const Chapter = searchParams.get("chapter");
   const [studyZoneData, setStudyZoneData] = useState<Data>();
-  const [units,setUnits]=useState<Record<string, string>>()
-  const [chapters,setChapters]=useState<Record<string, string>>()
+  const [units,setUnits]=useState<Unit>()
+  const [chapters,setChapters]=useState<Chapter>()
   const[lecture,setLecture]=useState<Record<string, Lecture>>()
   const token = localStorage.getItem("accessToken");
   const [videoUrl, setVideoUrl] = useState("");
   const [fileName, setFilename] = useState("");
   const [subject, setsubject] = useState("");
+  const [transcript,setTranscript]=useState("")
   const subjects = [
     {
       title: "Physics",
@@ -143,7 +145,7 @@ const StudyZone: React.FC = () => {
     setStudyZoneData(res?.data);
   };
  
-  const getVideoUrl = async (obj: string) => {
+  const getVideoUrl = async (obj: string,name:string) => {
     const res = await post(
       `${baseUrl}api/v1/study/url`,
       {
@@ -153,10 +155,17 @@ const StudyZone: React.FC = () => {
       },
       { AUTHORIZATION: `Bearer ${token}` }
     );
+    const tranres = await get(
+      `${baseUrl}api/v1/rag/transcript/${sub}/${name}`,
+     
+      { AUTHORIZATION: `Bearer ${token}` }
+    );
+    setTranscript(tranres?.data?.transcript)
     setFilename(obj);
     setsubject(sub || "");
     setVideoUrl(res?.data?.signed_url);
   };
+
   const getUnits = async (id: string) => {
     const res = await get(
       `${baseUrl}api/v1/study/units/${id}`,
@@ -181,6 +190,7 @@ const StudyZone: React.FC = () => {
     );
     setLecture(res?.data)
   };
+  
   useEffect(() => {
     getHomeData();
   }, []);
@@ -301,7 +311,7 @@ const StudyZone: React.FC = () => {
                     }
                   >
                     <p className="title d-flex align-center justify-between">
-                      {data}{" "}
+                      {data.name}{" "}
                       {/* <p
                         className={`status ${
                           data.val === 0
@@ -347,7 +357,7 @@ const StudyZone: React.FC = () => {
               {
                 units&&units[
                   unit as string
-                ]
+                ].name
               }
             </h3>
             <div className="video-card-wrapper video-grid d-flex flex-column ">
@@ -366,7 +376,7 @@ const StudyZone: React.FC = () => {
                     }
                   >
                     <p className="title d-flex align-center justify-between">
-                      {data}{" "}
+                      {data.name}{" "}
                       {/* <p
                         className={`status ${
                           parseInt(data.progress) === 0
@@ -410,7 +420,7 @@ const StudyZone: React.FC = () => {
           <div className="quick-actions-wrapper d-flex flex-column ">
             <h3>
               {
-              chapters&&chapters[Chapter as string]
+              chapters&&chapters[Chapter as string].name
               }
             </h3>
             <div className="topics-wrapper d-flex flex-column ">
@@ -427,7 +437,7 @@ const StudyZone: React.FC = () => {
                       navigate(
                         `/study-zone?section=video&unit=${unit}&val=${id}&chapter=${Chapter}&sub=${sub}`
                       );
-                      getVideoUrl(data.bucket_path);
+                      getVideoUrl(data.bucket_path,data.name);
                     }}
                   >
                
@@ -486,7 +496,7 @@ const StudyZone: React.FC = () => {
           >
             <img src={Back} alt="back" /> Back to Topics
           </div>
-          {videoUrl ? <VideoPlayer url={videoUrl} /> : <>Loding</>}
+          {videoUrl ? <VideoPlayer url={videoUrl} transcript={transcript} /> : <>Loding</>}
         </>
       )}
     </div>
